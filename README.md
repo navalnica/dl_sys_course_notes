@@ -29,7 +29,7 @@ The only constrain on the network te be considered "deep" is to have $\ge 1$ hid
   *   hidden layers
   *   activations
   *   neurons
-* **Universal approximation theorem**: a one-hidden-layer NN can approximate any smooth function _f_ given any accuracy $\epsilon$ <br>
+* **Universal approximation theorem**: a one-hidden-layer NN can approximate any smooth function _f_ over closed domain $\mathcal{D}$ given any accuracy $\epsilon > 0$ <br>
 The size of a hidden layer grows exponentially compared to the input size.
 
 Why to use deep networks?
