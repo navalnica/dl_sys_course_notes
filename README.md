@@ -45,7 +45,7 @@ There are other not very important reasons to use Deep Networks:
 The brain does multi-stage processing of its inputs before it reaches the final decision making center.
 * From circuit theory. Certain functions can be represented much more efficiently 
 using a multi-stage architecture. A classic example is the **parity function**.
-However parity function is not very relevant to functions that we approximate in practise.
+However parity function is not very relevant to functions that we approximate in practice.
 Besides, gradient descent is horrible at learning functions like parity.
 
 ### Questions:
