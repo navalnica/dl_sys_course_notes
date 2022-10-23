@@ -55,3 +55,9 @@ Can we remove this constraint by not specifying activation function explicitly
 and let NN decide what activation function to use?
 
 ## [Lecture 3 (Part II)](https://www.youtube.com/watch?v=JLg1HkzDsKI) - "Manual" Neural Networks
+* TODO: add general formula to compute gradients of multilayer feedworward network
+
+## [Lecture 4](https://www.youtube.com/watch?v=56WUlMEeAuA) - Automatic Differentiation
+
+
+## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
