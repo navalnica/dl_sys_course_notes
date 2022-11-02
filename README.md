@@ -14,7 +14,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * The main point of using multi-layer Neural Networks is to automate feature construction process.
 We no longer need to design features ourselves - instead we put some restrictions on the type of features
 (by defining activation function) and features are constructed by the NN automatically.
-* Random Fourier features: $cos(W),\ W -$ is a (fixed) matrix of random Gaussian samples.
+* Random Fourier features: $cos(W),\ W$ - is a (fixed) matrix of random Gaussian samples.
 These features work great for many problems.
 * A **Neural Network** refers to a particular type of hapythesis class, 
 consisting of multiple, parameterized differentiable functions (aka layers) 
@@ -86,7 +86,7 @@ and let NN decide what activation function to use?
   Main disadvantages:
   * It's very inefficient to compute second order gradients (hessians).<br>
     One of the reasons is that the size of hessian matrix for parameter-vector is quadratic 
-    in the size of paramter-vector ( $ n^2 $ ).<br>
+    in the size of paramter-vector ($n^2$).<br>
     However there are somewhat efficient methods to compute approximates of hessian.
   * For non-convex optimization (as is the case with real world deep learning problems), it's very unclear that we even **want** to use the Newton direction
   * It's also difficult to derive stochastic version of Newtons method
@@ -123,7 +123,7 @@ and let NN decide what activation function to use?
 * We can't initialize parameters of feedforward network with all 0s, because all activations and gradiens will be 0 as well. A local minimum, but a bad one :)
 * Let's initialize weights of feedforward network (100 hidden units, depth 50, ReLU nonlinearities) with random gaussians with mean = 0.
   * The choice of variance has huge implication for the resulting performance, weights, magnitude of gradients
-  * $ \large \sigma^2  = \frac{1}{n}, \sigma^2 = \frac{2}{n}, \sigma^2 = \frac{3}{n} $ variances differ only by the constant factor. However they result in norm of feedforward activations and norm of gradients that differ **on the order of magnitudes**!
+  * $\large \sigma^2  = \frac{1}{n}, \sigma^2 = \frac{2}{n}, \sigma^2 = \frac{3}{n}$ variances differ only by the constant factor. However they result in norm of feedforward activations and norm of gradients that differ **on the order of magnitudes**!
 
 #### Weights don't actually move "that much" during training
 * It's really important where you start, what initialization use
@@ -133,19 +133,19 @@ and let NN decide what activation function to use?
   When **ReLU is a non-linearity function**, Kaiming initialization ensures that $z_i \sim \mathcal{N}(0, 1)$ for each hidden layer.<br>
   Derivation for element of activation matrix:<br>
   
-  $ z_i \sim \mathcal{N}(0,I_{n_i}),\ z_i \in \mathbb{R}^{n_i} $ - activation vector<br>
+  $z_i \sim \mathcal{N}(0,I_{n_i}),\ z_i \in \mathbb{R}^{n_i}$ - activation vector<br>
   
-  $ \large w_i \sim \mathcal{N}(0,\frac{2}{n} I_{n_i}),\ w_i \in \mathbb {R}^{n_i} $ - parameter vector <br>
+  $\large w_i \sim \mathcal{N}(0,\frac{2}{n} I_{n_i}),\ w_i \in \mathbb {R}^{n_i}$ - parameter vector <br>
   
-  $ \large Var(w_i z_i) = Var(\sum_{k=1}^{n}{w_{i, k} z_{i, k}}) = 
-  n Var(w_{i,k}) Var(z_{i,k}) $ - because $w_i$ and $z_i$ are independent<br>
+  $\large Var(w_i z_i) = Var(\sum_{k=1}^{n}{w_{i, k} z_{i, k}}) = 
+  n Var(w_{i,k}) Var(z_{i,k})$ - because $w_i$ and $z_i$ are independent<br>
   
   ReLU operation keeps only positive values in the sum - approximately half of values for vector from gaussian. Thus:<br>
   
-  $ Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum_{k=1}^{n}{w_{i, k} z_{i, k}})) = 
-  \frac{n}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n}{2} \frac{2}{n} 1 = 1 $<br>
+  $Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum_{k=1}^{n}{w_{i, k} z_{i, k}})) = 
+  \frac{n}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n}{2} \frac{2}{n} 1 = 1$<br>
   
-  $ \large \mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum_{k=1}^n ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = 
+  $\large \mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum_{k=1}^n ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = 
   \sum_{k=1}^n ReLU(\mathbb{E}w_{i, k} \mathbb{E}z_{i, k}) = 0$
 
 
