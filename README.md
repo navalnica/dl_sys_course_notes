@@ -57,13 +57,20 @@ Besides, gradient descent is horrible at learning functions like parity.
 Can we remove this constraint by not specifying activation function explicitly 
 and let NN decide what activation function to use?
 
+---
+
 ## [Lecture 3 (Part II)](https://www.youtube.com/watch?v=JLg1HkzDsKI) - "Manual" Neural Networks
 * TODO: add general formula to compute gradients of multilayer feedworward network
 
+---
+
 ## [Lecture 4](https://www.youtube.com/watch?v=56WUlMEeAuA) - Automatic Differentiation
+
+---
 
 ## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
 
+---
 
 ## [Lecture 6](https://www.youtube.com/watch?v=CukpVt-1PA4) - Fully connected networks, optimization, initialization
 
@@ -152,3 +159,51 @@ and let NN decide what activation function to use?
   A helpful [Distill article](https://distill.pub/2017/momentum) about Momentum.
 * how unbiased version of Momentum and Adam will look like if we use $\alpha^{*} = \alpha (1 - \beta)$ and won't use $(1-\beta)$ term?
 * Prove that $Var(xy) = Var(x) \ Var(y)$ for independent $x$, $y$ variables
+
+---
+
+## [Lecture 7](https://www.youtube.com/watch?v=fzKNkS_5E6U) - Neural Network Abstractions
+
+### Programming abstractions
+* It's useful to learn from programming abstractions used in different automatic differentiation frameworks. It helps to:
+  * understand why the abstractions were designed in this way
+  * learn how to design new abstractions
+
+* Caffe
+  * Created based on `cuda-convnet` that was developed by Alex Krizhevsky in AlexNet framework
+  * Introduces **Layer** abstractions (exp, sum, ...). It's a class that implements `forward` and `backward` methods.
+  * Forward and backward computations are performed in-place.
+
+* Tensorflow 1.0
+  * Based on a **computational graph** architecture:
+    * At first we describe forward computations
+    * Gradients computations are performed by extending computational graph with new nodes.
+      This nodes are computed using forward pass operator methods implemented early.
+  * First DL framework that used computational graph architecture was `Theano`. 
+    TensorFlow 1.0 shares some concepts with Theano.
+  * TensorFlow was developed by Google. And Google usually develops its products in a way to support
+    parallel and distributed execution
+  * Designed in **declarative** style. This approach helps to separate developing environment from execution one.
+    Any Tensorflow script consists of two parts: 
+    * **Declaration** part. the computation graph is defined here
+    * **Run part**. Here `tf.Session` object is created.
+      It optimizes computational graph, caches nodes and runs computations on specified hardware (CPUs, GPUs, TPUs) - 
+      local or remote, single machine or distributed cluster, sequentially or in parallel mode.
+
+* PyTorch (needle as well):
+  * Defined in **imperative** (also known as **define by run**) concept
+  * The first framework that used imperative style to define computational graph was `Chainer`. PyTorch is based on it.
+  * Executes computations as we construct computational graph
+  * Allows for easy mixing of python control flow and computational graph construction.<br>
+    e.g. we can construct computataional graph **dynamically** by examining its nodes values.<br>
+    This allows to process input sequences of variable length (as in NLP) or build stochastic computational graph
+    where number of layers is determined randomly.
+    In contrast, TensorFlow is said to provide the way to build only **static** computational graphs.
+  * Such imperative style is widely used in research and model prototyping
+  * It's much more convenient to debug PyTorch program compared to TensorFlow because of imperative style computations.
+  * However TensorFlow 1 still provides much more opportunities to optimize computational graph. 
+    This optimization benefits both training and inference.
+  * However there are number of optimization techniques for PyTorch: lazy evaluation, just in time compilation, etc.
+    
+### High level modular library components
+
