@@ -137,13 +137,13 @@ and let NN decide what activation function to use?
   
   $\large w_i \sim \mathcal{N}(0,\frac{2}{n} I_{n_i}),\ w_i \in \mathbb {R}^{n_i}$ - parameter vector <br>
   
-  $\large Var(w_i z_i) = Var(\sum_{k=1}^{n}{w_{i, k} z_{i, k}}) = n Var(w_{i,k}) Var(z_{i,k})$ - because $w_i$ and $z_i$ are independent<br>
+  $Var(w_i z_i) = Var(\sum\limits^{n}\limits_{k=1}{w_{i, k} z_{i, k}}) = n Var(w_{i,k}) Var(z_{i,k})$ - because $w_i$ and $z_i$ are independent<br>
   
   ReLU operation keeps only positive values in the sum - approximately half of values for vector from gaussian. Thus:<br>
   
-  $Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum_{k=1}^{n}{w_{i, k} z_{i, k}})) = \frac{n}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n}{2} \frac{2}{n} 1 = 1$<br>
+  $Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum\limits^{n}\limits_{k=1}{w_{i, k} z_{i, k}})) = \frac{n}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n}{2} \frac{2}{n} 1 = 1$<br>
   
-  $\large \mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum_{k=1}^n ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = \sum_{k=1}^n ReLU(\mathbb{E}w_{i, k} \mathbb{E}z_{i, k}) = 0$
+  $\mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum\limits^{n}\limits_{k=1} ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = \sum\limits^{n}\limits_{k=1} ReLU(\mathbb{E}w_{i, k} \mathbb{E}z_{i, k}) = 0$
 
 
 ### Questions:
