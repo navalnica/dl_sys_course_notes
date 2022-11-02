@@ -57,20 +57,16 @@ Besides, gradient descent is horrible at learning functions like parity.
 Can we remove this constraint by not specifying activation function explicitly 
 and let NN decide what activation function to use?
 
----
 
 ## [Lecture 3 (Part II)](https://www.youtube.com/watch?v=JLg1HkzDsKI) - "Manual" Neural Networks
 * TODO: add general formula to compute gradients of multilayer feedworward network
 
----
 
 ## [Lecture 4](https://www.youtube.com/watch?v=56WUlMEeAuA) - Automatic Differentiation
 
----
 
 ## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
 
----
 
 ## [Lecture 6](https://www.youtube.com/watch?v=CukpVt-1PA4) - Fully connected networks, optimization, initialization
 
@@ -160,7 +156,6 @@ and let NN decide what activation function to use?
 * how unbiased version of Momentum and Adam will look like if we use $\alpha^{*} = \alpha (1 - \beta)$ and won't use $(1-\beta)$ term?
 * Prove that $Var(xy) = Var(x) \ Var(y)$ for independent $x$, $y$ variables
 
----
 
 ## [Lecture 7](https://www.youtube.com/watch?v=fzKNkS_5E6U) - Neural Network Abstractions
 
