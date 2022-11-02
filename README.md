@@ -85,7 +85,8 @@ and let NN decide what activation function to use?
   otherwise (when $\alpha<1$) the algorithm is called **damped** Newtons method.<br>
   Main disadvantages:
   * It's very inefficient to compute second order gradients (hessians).<br>
-    One of the reasons is that the size of hessian matrix for parameter-vector is quadratic in the size of paramter-vector ($ n^2 $).<br>
+    One of the reasons is that the size of hessian matrix for parameter-vector is quadratic 
+    in the size of paramter-vector ( $ n^2 $ ).<br>
     However there are somewhat efficient methods to compute approximates of hessian.
   * For non-convex optimization (as is the case with real world deep learning problems), it's very unclear that we even **want** to use the Newton direction
   * It's also difficult to derive stochastic version of Newtons method
@@ -132,7 +133,7 @@ and let NN decide what activation function to use?
   When **ReLU is a non-linearity function**, Kaiming initialization ensures that $z_i \sim \mathcal{N}(0, 1)$ for each hidden layer.<br>
   Derivation for element of activation matrix:<br>
   
-  $ \large{z_i \sim \mathcal{N}(0,I_{n_i}),\ z_i \in \mathbb{R}^{n_i}} $ - activation vector<br>
+  $ z_i \sim \mathcal{N}(0,I_{n_i}),\ z_i \in \mathbb{R}^{n_i} $ - activation vector<br>
   
   $ \large w_i \sim \mathcal{N}(0,\frac{2}{n} I_{n_i}),\ w_i \in \mathbb {R}^{n_i} $ - parameter vector <br>
   
