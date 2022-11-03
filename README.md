@@ -205,12 +205,17 @@ and let NN decide what activation function to use?
 ### High level modular library components
 
 #### Module
-* Any computational **Module** (like `torch.nn.Module`) follows a common principle of "tensor in, tensor out".
-  Sometimes Module can take several tensors as inputs.
-* Module encapsulates following things:
-  * Defines a way to compute outputs for given inputs
-  * Storage and initialization of trainable parameters
-  * Defines a way to compute gradients for trainable parameters
+* Helps to compose things together
+* Any Module follows a common principle of "tensor in, tensor out".
+  Sometimes Module can take several tensors as inputs, but usually - one.
+* Module does the following:
+  * Defines a forward pass: a way to compute outputs for given inputs
+  * Provides storage and defines initialization of trainable parameters
+  * In some Deep Learning frameworks modules also handle gradients computation (like in Caffe).<br>
+    But in frameworks based on computational graph abstraction (TensorFlow, PyTorch) we only need to define
+    a forward pass for a module - gradient computations are performed **automatically** 
+    by Tensor and Operation (add, div, sum, etc.) objects!
+
 * Loss function is a special kind of Module. It takes input tensors and outputs scalar value (tensor of rank 0)
 * Multiple losses can be combined together. For example in the case of object detection and recognition one loss
   would find object bounding boxes and the other one will predict its class value. We can then take (possibly weighted)
@@ -254,7 +259,17 @@ and let NN decide what activation function to use?
   change the Optimizer - the rest of pipeline remains the same
 
 
-#### Questions
-* revisit end of current lecture after some time to better understand the point on separating gradient computations
-  from defining NN modules. example provided: ResNet. It would be hard to build ResNet with Caffe-style framework and
-  computational graph abstraction helps here a lot.
+#### Comparison of Caffe and PyTorch. Separation of gradient computation from module composition
+* It's highly effective to **separate gradient computation from module composition** in 2 distinct levels of API.
+* In Caffe each Module defines both forward and backward passes. 
+  So, gradient computation is coupled with module composition.<br>
+  This makes it hard to implement complex modules such as Residual module. Because gradient computation in this case
+  is not trivial: we need to manually specify gradient computations for all intermediate parameters 
+  in the Residual block to be able to obtain gradient for input Tensor.
+* In PyTorch for each module we define only the forward pass (besides weights initialization). 
+  When actual tensors are passed through the module object,
+  computational graph gets extended by new nodes. Gradients computation and backpropagation is handled by
+  Tensor and Operation (add, div, sum, etc.) objects. 
+  This separation helps to build complex models easily, e.g. those that contain Residual modules.<br>
+  Such Module implementation allows to focus on constructing new nodes for computational graph 
+  and forget about automatic differentiation.
