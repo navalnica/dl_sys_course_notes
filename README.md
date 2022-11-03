@@ -150,10 +150,12 @@ and let NN decide what activation function to use?
 
 
 ### Questions:
-* why parameter scaling is that important when optimizing parameters? why Adam sometimes performs better than Momentum?<br>
+* Why parameter scaling is that important when optimizing parameters? why Adam sometimes performs better than Momentum?<br>
   need to get more intuition in differences of various optimization algorithms.<br>
   A helpful [Distill article](https://distill.pub/2017/momentum) about Momentum.
-* how unbiased version of Momentum and Adam will look like if we use $\alpha^{*} = \alpha (1 - \beta)$ and won't use $(1-\beta)$ term?
+* How unbiased version of Momentum and Adam will look like if we use $\alpha^{*} = \alpha (1 - \beta)$ and won't use $(1-\beta)$ term?
+* How to overcome the problem that trained weights are relatively close to initialization weights? Do we need to
+  construct an ensemble of models initialized with different strategies?
 * Prove that $Var(xy) = Var(x) \ Var(y)$ for independent $x$, $y$ variables
 
 
@@ -202,3 +204,57 @@ and let NN decide what activation function to use?
     
 ### High level modular library components
 
+#### Module
+* Any computational **Module** (like `torch.nn.Module`) follows a common principle of "tensor in, tensor out".
+  Sometimes Module can take several tensors as inputs.
+* Module encapsulates following things:
+  * Defines a way to compute outputs for given inputs
+  * Storage and initialization of trainable parameters
+  * Defines a way to compute gradients for trainable parameters
+* Loss function is a special kind of Module. It takes input tensors and outputs scalar value (tensor of rank 0)
+* Multiple losses can be combined together. For example in the case of object detection and recognition one loss
+  would find object bounding boxes and the other one will predict its class value. We can then take (possibly weighted)
+  sum of two losses and execute `.backward()` method of scalar that is result of summation to propagate gradients.
+* Some modules should behave differently while training and inference. For example we often don't need to compute
+  loss values during inference. A special Module's parameter allows to control this behaviour.
+
+#### Optimizer
+* **Optimizer** is another high level component. It allows to:
+  * acces model parameters and perform optimization steps on them
+  * keep track of state variables such as momentum terms for SGD with momentum
+* Regularization can be performed:
+  * Either in loss function: $l = l + ||w||_2$
+  * Or directly in the optimizer, as a part of weights update. This is called **weight decay**
+
+
+#### Initialization
+* We need to consider magnitudes of initialization values:
+  * If we initialize parameters with too small values, after a few layers of propagation, values will become close to 0
+  * If initializing with too large values, after a few layers of propagation, values will explode
+* Initialization routines that try to control weights magnitude depending on model architecture to ensure that
+  overall magnitude of values (activations? gradients?) do not change very much.
+
+#### Data loader and preprocessing
+* Besides data loading and preprocessing, allows to shuffle and augment data by applying various transformations
+* Data transformations usually need to be implemented as separate modules.<br>
+  This allows to easily combine them in preprocessing pipelines, change one transformation with another.<br>
+  Combining all data transformations and augmentations in a single function is usually a bad approach :)
+* Data augmentation can account for significant portion of prediction accuracy boost for Deep Learning models
+
+#### Other components:
+* Learning rate schedulers
+* Hyperparameter tuning component
+* Trainer - model training abstraction
+* Callbacks to store movel metrics. e.g. TensorBoard
+* Experiment tracking frameworks
+
+#### Deep learning is modular in nature
+* We can build new models on the backbone of existing ones by simply changing the loss function, for example
+* If we want to explore the effect of various optimization strategies on model performance we simply 
+  change the Optimizer - the rest of pipeline remains the same
+
+
+#### Questions
+* revisit end of current lecture after some time to better understand the point on separating gradient computations
+  from defining NN modules. example provided: ResNet. It would be hard to build ResNet with Caffe-style framework and
+  computational graph abstraction helps here a lot.
