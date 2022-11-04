@@ -273,3 +273,38 @@ and let NN decide what activation function to use?
   This separation helps to build complex models easily, e.g. those that contain Residual modules.<br>
   Such Module implementation allows to focus on constructing new nodes for computational graph 
   and forget about automatic differentiation.
+
+
+## [Lecture 8](https://www.youtube.com/watch?v=uB81vGRrH0c) - Neural Network Library Implementation
+
+### Gradient update implementation
+
+* Gradient update should be performed on detached tensors. Otherwise **memory leak** will happen:
+    * because a new node is added to computational graph (memory is spent on this node)
+    * and, moreover, this node holds references to its inputs and to their inputs recursively. 
+      thus, previous graph nodes (there might be a lot of them) cannot be released by garbage collector.
+
+  It's also important to detach **both** previous parameter tensor **and gradient tensor**.
+  ```python
+  w = w.detach() - lr * grad.detach()
+  ```
+* Gradient update can be implemented in place if we add setter `data` method that accesses underlying tensor data:
+  ```python
+  w.data = w.detach() - lr * grad.detach()
+  ```
+
+### Numerical stability
+
+* limited float numbers precision may result in numerical errors and overflows
+* for example, `exp(100) == nan`
+* in order to compute softmax for arbitrary inputs we can apply following transformation:<br>
+  $\large z_i = \dfrac{exp(x_i)}{\sum\limits_{k} exp(x_k)} = \dfrac{exp(x_i - c)}{\sum\limits_{k} exp(x_k - c)},\ c \in  \mathbb{R}$<br>
+  we can take $c = max(x_i)$. thus all inputs for `exp` operation will be $\le 0$ 
+  and this will improve numerical stability.
+* similar principles hold when we compute **logsoftmax** and **logsumexp** operations
+
+
+### Other notes
+
+* It's important to appreciate simple and elegant modular design of modern Deep Learning frameworks. 
+  This design might seem obvious now, but back in the past it was not yet invented.
