@@ -376,6 +376,37 @@ and let NN decide what activation function to use?
   Doing so in `train` mode
   makes Batch Norm to update running averages for mean and variance. So normalization becomes incorrect 😅
 
+### Regularization
+* Deep Neural Networks are often **overparameterized models**: 
+  they contain more parameters than the number of training examples
+* Under certain assumptions it means that such network may fit training data completely (loss == 0)
+* This may lead to overfitting: model performs well on training data but can't generalize to unseen data
+* However, Deep Neural Networks are still able to generalize well (though many large models will often still overfit)
+* To fight overfitting regularization is used
+* **Regularization** - is a process of limiting complexity of a the hypothesis class
+  to help models generalize better to unseen data
+* There are 2 types of regularization
+  * **Implicit regularization**
+    * Complexity is limited by particular algorithms or architectures used
+    * If we say that class of Deep Neural Networks is overparameterized, we consider every possible point in
+      weights feature space and, I guess, every possible model architecture.<br>
+      By making **specific choices on model architecture and optimization** we implicitly limit number of available
+      implementations of this hypothesis class.<br>
+      In practice, when we train a network **we are not optimizing over the space of all possible neural networks**.
+    * **SGD with a given weight initialization** is an example of implicit regularization. 
+      The reason is that particular weight initialization makes only specific part of weights feature space 
+      attainable during training (recall that weights do not change much during training).
+      It means model can't reach every possible point in weights feature space - 
+      thus limiting complexity of a hypothesis class.
+  * **Explicit regularization**
+    * Refers to modifications made to the network and training procedure explicitly intended to regularize the network
+    * $L_2$ regularization, a.k.a. weight decay
+    * dropout
+
+#### $L_2$ regularization (weight decay)
+* TODO
+#### Dropout
+* TODO
 ### Questions:
 * when explaining the effect of initialization norms and variances were used together. probably "variance" is a typo?
   if not, why we used weights variance instead of weights norm?<br>
