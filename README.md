@@ -366,8 +366,11 @@ and let NN decide what activation function to use?
 * Such feature-wise normalization resembles the way features get preprocessed for classical machine learning algorithms.
 * An important note about Batch Norm is that it introduces **minibatch dependence**: 
   outputs for single example in a minibatch depend on the rest examples in minibatch
-* To deal with minibatch depency Batch Norm layers keeps track of **running averages** 
-  for mean and variance of each feature
+* To deal with minibatch depency at test (evaluation) time Batch Norm layers keeps track of **running averages** 
+  for mean and variance of each feature:<br>
+  $\hat{\mu}_{i} = (1 - \beta) \hat{\mu}_{i-1} + \beta \mu_{i}$<br>
+  $\hat{\sigma}^2_{i} = (1 - \beta) \hat{\sigma}^2_{i-1} + \beta \sigma^2_{i}$<br>
+  where $\beta > 0$ - is a momentum parameter
 * **Inference for trained networks that contain Batch Norm layers must be run only in `eval` mode**.<br>
   Doing so in `train` mode
   makes Batch Norm to update running averages for mean and variance. So normalization becomes incorrect 😅
@@ -379,3 +382,6 @@ and let NN decide what activation function to use?
   if so, it would also be interesting to examing weights norm across layers.
 * Initialization: Does the same weights variance indicate that weight stay about the same? the network should have
   learned -> weights should have been optimized. but it's weird that variance stayed the same
+* Batch Norm: can we use simple averaging instead of exponential averaging to compute running averages?
+* Batch Norm: why do we use running averages only at the test time? Can we use these estimates for mean and variance
+  while training instead of current minibatch statistics?
