@@ -368,7 +368,8 @@ and let NN decide what activation function to use?
   outputs for single example in a minibatch depend on the rest examples in minibatch
 * To deal with minibatch depency at test (evaluation) time Batch Norm layers keeps track of **running averages** 
   for mean and variance of each feature:<br>
-  $\hat{\mu}_{i} = (1 - \beta) \hat{\mu}_{i-1} + \beta \mu_{i}$<br>
+  <!--  For some reason we need to escape `_` in subscripts here in order for GitHub to render the formula correctly -->
+  $\hat{\mu}\_{i} = (1 - \beta) \hat{\mu}\_{i-1} + \beta \mu\_{i}$<br>
   $\hat{\sigma}^2_{i} = (1 - \beta) \hat{\sigma}^2_{i-1} + \beta \sigma^2_{i}$<br>
   where $\beta > 0$ - is a momentum parameter
 * **Inference for trained networks that contain Batch Norm layers must be run only in `eval` mode**.<br>
