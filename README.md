@@ -308,3 +308,73 @@ and let NN decide what activation function to use?
 
 * It's important to appreciate simple and elegant modular design of modern Deep Learning frameworks. 
   This design might seem obvious now, but back in the past it was not yet invented.
+
+
+## [Lecture 9](https://www.youtube.com/watch?v=ky7qiKyZmnE) - Normalization and Regularization
+
+### Initialization
+* Initialization matters a lot
+* MNIST 50 layer network example:
+  With different variance values used to initialize weights:
+  * before training:
+    * activations norm **change linearly** over layers. the slope of change depends on variance value used
+    * gradients norm stays about the same across layers. 
+      magnitude of gradient norm depends on variance value used (is proportional)
+    * weights variance stays about the same across layers. 
+      magnitude of weights variance depends on variance value used (is proportional)
+  * after training completed (< 5% error):
+    * activations norm increases over layers for all variance value used
+    * gradients norm changes (no clear dependency. some curve) over layers.
+      no clear dependency on variance value used
+    * weights variance stays about the same across layers. 
+      magnitude of weights variance depends on variance value used (is proportional)
+  * **NOTE**: weights variance across layers is almost the same **before and after training**.
+    training somehow did not impact weights variance.<br>
+    **Question**: Does the same weights variance indicate that weight stay about the same? the network should have
+    learned -> weights should have been optimized. but it's weird that variance stayed the same
+
+### Normalization
+* Instead of (or together with) trying to initialize all weights "correctly" we can directly change layer activations
+  to have any required mean and variance.<br>
+  We can perform such normalization either element-wise (**Layer norm**) or feature-wise (**Batch norm**)
+* Normalization allows to wory about initialization much less. 
+  We are no longer afraid of exploding or vanishing activation. 
+  But the final model weights after training still depend on initialization approach.
+* Using either Layer norm or Batch norm fixes the issue with activation norm increasing or decreasing over layers
+  and huge difference in gradients magnitudes. 
+  Now all activations and gradients stay relatively constant across layers 
+  and their magnitude almost doesn't depend on variance value used in initizalition
+
+#### Layer normalization
+* **Layer norm** normalizes activations on-the-fly. 
+  It adds a new layer $Z_{i+1}$ that equals to a normalized previous layer acivations:<br>
+  $z_{i+1} = \dfrac{z_i - \mathbb{E}[z_i]}{\sqrt{Var[z_i] + \epsilon}}, z_i$ - 
+  is an activation for *i*-th data sample.<br>
+  Layer norm is applied **example-wise** (row-wise): 
+  activations for each data sample are normalized independently.
+* **For standard Fully Connected Networks it's often harder to train model to have low loss when Layer Norm is used**<br>
+  One of the reason is that relative norms and variances of different examples 
+  may be a useful feature to discriminate (e.g. classify) examples.
+
+#### Batch normalization
+* Contrary to Layer norm, **Batch norm** normalizes activations feature-wise (column-wise) over the minibatch
+* This allows for different data samples to preserve different mean and variance (across their features).
+  And this might be used by network to discriminate examples.
+* At the same time activations are get normalized. That brings control over activations magnitude and helps to prevent
+  them from exploding in the deeper layers
+* Such feature-wise normalization resembles the way features get preprocessed for classical machine learning algorithms.
+* An important note about Batch Norm is that it introduces **minibatch dependence**: 
+  outputs for single example in a minibatch depend on the rest examples in minibatch
+* To deal with minibatch depency Batch Norm layers keeps track of **running averages** 
+  for mean and variance of each feature
+* **Inference for trained networks that contain Batch Norm layers must be run only in `eval` mode**.<br>
+  Doing so in `train` mode
+  makes Batch Norm to update running averages for mean and variance. So normalization becomes incorrect 😅
+
+### Questions:
+* when explaining the effect of initialization norms and variances were used together. probably "variance" is a typo?
+  if not, why we used weights variance instead of weights norm?<br>
+  probably because in initialization we control variance and not norm.<br>
+  if so, it would also be interesting to examing weights norm across layers.
+* Initialization: Does the same weights variance indicate that weight stay about the same? the network should have
+  learned -> weights should have been optimized. but it's weird that variance stayed the same
