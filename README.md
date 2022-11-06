@@ -374,7 +374,14 @@ and let NN decide what activation function to use?
   where $\beta > 0$ - is a momentum parameter
 * **Inference for trained networks that contain Batch Norm layers must be run only in `eval` mode**.<br>
   Doing so in `train` mode
-  makes Batch Norm to update running averages for mean and variance. So normalization becomes incorrect 😅
+  makes Batch Norm to update running averages for mean and variance. So normalization becomes incorrect 😅<br>
+* **However**! Running Batch Norm at test time substantially improves classifiers performance 
+  on distribution shift (out-of-distribution data)!<br>
+  Paper: [Tent: Fully Test-time Adaptation by Entropy Minimization](https://arxiv.org/abs/2006.10726)
+* Batch Norm was developed as a techique to help optimization or avoid Dropout.<br>
+  Then lots of research happened that challange explanations why Batch Norm works.<br>
+  And now it's getting a third life as a technique to improve networks robustness to distributional shift.
+* TODO: Add links to Batch Norm eploration papers
 
 ### Regularization
 * Deep Neural Networks are often **overparameterized models**: 
@@ -400,13 +407,58 @@ and let NN decide what activation function to use?
       thus limiting complexity of a hypothesis class.
   * **Explicit regularization**
     * Refers to modifications made to the network and training procedure explicitly intended to regularize the network
-    * $L_2$ regularization, a.k.a. weight decay
-    * dropout
+    * Most common examples: 
+      * $L_2$ regularization, a.k.a. weight decay
+      * Dropout
 
 #### $L_2$ regularization (weight decay)
-* TODO
+**TODO. Detalize notes**
+* apply to activations of network, not to weights
+* plain implementation changes overall activation (and weights, I guess)
+
+* in classical Machine Learning smaller weights meant smoother function. Lipschitz constant
+* general optimization problem of all Machine Learning :)
+* updated version of weight update :)
+* $\lambda$ - tradeoff between actual loss and regularization term
+* **weight decay** etymology
+* $L_2$ norm term is better considered as a part of a loss function and not of optimization algorithm.
+  However, now it's often implemented as part of optimization algorightms.
+* Caveat. Unclear how weights norm affect training.<br>
+  Parameters magnitude may be a bad proxy of deep network complexity
+* we can ignore weight decay completely. especially when using normalization layers (Batch Norm, Layer Norm)<br>
+  (?) normalization of activations leads to normalization in weights (?)
+
 #### Dropout
-* TODO
+**TODO. Detalize notes**
+
+* plain dropout changes distribution (magnitude) of activations. variance of weights no longer remain steady.
+* need to scale weights by probability to keep them
+* typically (not always) applied only during training, not in test time
+* may seem very odd: we must be massively changing the function that we are approximating
+* makes network robust to missing activations. but it's not obvious way of thining. better to thinks of it as 
+  a **Stochastic approximation**
+* Dropout takes the idea of a stochastic approximation 
+  (like in SGD we approximate true gradient due to noise introduced by batch selection)
+  to activations of a network. 
+  Doing so provides similar degree of regularization as SGD provides for traditional training objective
+
+### Interaction of initialization, optimization, normalization and regularization
+**TODO. Detalize notes**
+
+* There are many ways to ease networks optimizations procedure and make them perform better
+* And all of them interact with each other
+* We don't really know how these interactions work or what is the reason and how does each individual techique works
+* We don't even know how Batch Norm works exactly :)<br>
+  And there have been a lot of discussion on the nature of Batch Norm (see above)<br>
+  There are similar discussions for other techniques: dropout, weight decay, etc.
+* TODO: refactor 3 points below as they are kind of similar
+  * Sometimes it's shocking how similar very different architectures and training methods work
+    So we don't need to try out all possible combinations of design choices, 
+    as most of them will perform relatively similar
+  * The "good news" is that in many cases, it seems possible to get similarly good results with wildly different 
+    architectural and methodological choices
+  * I.E. we can get good performance with variety of different methods.
+
 ### Questions:
 * when explaining the effect of initialization norms and variances were used together. probably "variance" is a typo?
   if not, why we used weights variance instead of weights norm?<br>
@@ -417,3 +469,7 @@ and let NN decide what activation function to use?
 * Batch Norm: can we use simple averaging instead of exponential averaging to compute running averages?
 * Batch Norm: why do we use running averages only at the test time? Can we use these estimates for mean and variance
   while training instead of current minibatch statistics?
+* Change in activations magnitude changes weight magnitude, I guess. 
+  This was implicitly meant in discussion of:
+  * uselessness of weight decay for networks with normalization layers
+  * plain dropout changing activations distribution. and as a result changing distribution of weights
