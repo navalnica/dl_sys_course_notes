@@ -288,7 +288,8 @@ and let NN decide what activation function to use?
   ```python
   w = w.detach() - lr * grad.detach()
   ```
-* Gradient update can be implemented in place if we add setter `data` method that accesses underlying tensor data:
+* Gradient update is usually implemented inplace. To do so we need to add setter method `data` that accesses underlying tensor data. 
+  Alternatively, we can use `realize_cached_data()` method:
   ```python
   w.data = w.detach() - lr * grad.detach()
   ```
