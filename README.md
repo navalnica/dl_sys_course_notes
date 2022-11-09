@@ -6,8 +6,18 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Course main page](https://dlsyscourse.org/)
 * [YouTube channel](https://www.youtube.com/channel/UC3-KIvmiIaZimgXMNt7F99g)
 
+# Table of Contents:
+* Lecture 3
+  * [Part I - "Manual" Neural Networks](#lec3-1)
+* [Lecture 6 - Fully connected networks, optimization, ](#lec6)
+* [Lecture 7 - Neural Network Abstractions](#lec7)
+* [Lecture 8 - Neural Network Library Implementation](#lec8)
+* [Lecture 9 - Normalization and Regularization](#lec9)
+* [Lecture 10 - Convolutional Networks](#lec10)
 
 # Notes
+
+<a id="lec3-1"></a>
 
 ## [Lecture 3 (Part I)](https://www.youtube.com/watch?v=OyrqSYJs7NQ) - "Manual" Neural Networks
 
@@ -67,6 +77,8 @@ and let NN decide what activation function to use?
 
 ## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
 
+
+<a id="lec6"></a>
 
 ## [Lecture 6](https://www.youtube.com/watch?v=CukpVt-1PA4) - Fully connected networks, optimization, initialization
 
@@ -158,6 +170,8 @@ and let NN decide what activation function to use?
   construct an ensemble of models initialized with different strategies?
 * Prove that $Var(xy) = Var(x) \ Var(y)$ for independent $x$, $y$ variables
 
+
+<a id="lec7"></a>
 
 ## [Lecture 7](https://www.youtube.com/watch?v=fzKNkS_5E6U) - Neural Network Abstractions
 
@@ -274,6 +288,7 @@ and let NN decide what activation function to use?
   Such Module implementation allows to focus on constructing new nodes for computational graph 
   and forget about automatic differentiation.
 
+<a id="lec8"></a>
 
 ## [Lecture 8](https://www.youtube.com/watch?v=uB81vGRrH0c) - Neural Network Library Implementation
 
@@ -310,6 +325,8 @@ and let NN decide what activation function to use?
 * It's important to appreciate simple and elegant modular design of modern Deep Learning frameworks. 
   This design might seem obvious now, but back in the past it was not yet invented.
 
+
+<a id="lec9"></a>
 
 ## [Lecture 9](https://www.youtube.com/watch?v=ky7qiKyZmnE) - Normalization and Regularization
 
@@ -473,3 +490,16 @@ and let NN decide what activation function to use?
   This was implicitly meant in discussion of:
   * uselessness of weight decay for networks with normalization layers
   * plain dropout changing activations distribution. and as a result changing distribution of weights
+
+
+<a id="lec10"></a>
+
+## [Lecture 10](https://www.youtube.com/watch?v=-5RPPjn0hPg) - Convolutional Networks 
+* Drawbacks of using Fully Connected Layers for images:
+  * A LOT of parameters per single layers
+  * FCN do not capture image invariants (objects, patterns). 
+    A slight shift of image by 1 pixel might lead to completely different activations
+* One of dominant ideas in modern Deep Learning is to 
+  choose such types of architectures that kind of preserve 
+  initial structure of data. Like convolutions help to preserve image structure and invariances
+* Convolutions in DL and Signal processing mean different things
