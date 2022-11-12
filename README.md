@@ -17,6 +17,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 8 - Neural Network Library Implementation](#lec8)
 * [Lecture 9 - Normalization and Regularization](#lec9)
 * [Lecture 10 - Convolutional Networks](#lec10)
+* [Lecture 11 - Hardware Acceleration](#lec11)
 
 # Notes
 
@@ -74,12 +75,19 @@ and let NN decide what activation function to use?
 <a id="lec3-2"></a>
 
 ## [Lecture 3 (Part II)](https://www.youtube.com/watch?v=JLg1HkzDsKI) - "Manual" Neural Networks
+* TODO
 * TODO: add general formula to compute gradients of multilayer feedworward network
 
 
 <a id="lec4"></a>
 
 ## [Lecture 4](https://www.youtube.com/watch?v=56WUlMEeAuA) - Automatic Differentiation
+
+* TODO
+
+* Define **adjoint** $\overline{v}_i$ as a partial derivative of output scalar $y$ (typically a loss function)
+  with respect to an intermediate value node $v_i$:<br>
+  $\overline{v}_i = \dfrac{dy}{d v_i}$
 
 * **Partial derivatives** with respect to same parameter vary in dimensions depending on 
   what variable is been differentiated:
@@ -100,7 +108,7 @@ and let NN decide what activation function to use?
 <a id="lec5"></a>
 
 ## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
-
+* TODO
 
 <a id="lec6"></a>
 
@@ -542,8 +550,8 @@ and let NN decide what activation function to use?
   * output "pixel" vector is calculated as **matrix-vector product**:<br>
     $\large z_{i,j} = [k=3] = x_{i-1,j-1} W_{i-1, j-1} + x_{i-1,j} W_{i-1, j} + ... + x_{i+1,j+1} W_{i+1, j+1}$
 * Such way of thinking helps to represent a single convolution as a set of
-  $k \times k$ matrix multiplications, and their result is then summed. This helps to
-  implement convolutions (makes it easier to parallelize? TODO)
+  $k \times k$ matrix multiplications, and their result is then summed.<br>
+  This **helps to implement convolutions** (in what way? next sections tells that we are using atomic operations. TODO)
 * Usually, only odd-sized filters are used. Because it's more convenient
   to calculate output shapes, padding size compared to even-sized filters.
 * To build high level representations and reduce computations we often 
@@ -565,6 +573,80 @@ and let NN decide what activation function to use?
   **concatenation to patches** instead
 
 ### Differentiating
-* It's important to implement convolutions as **atomic operations**. Because we don't want to store all
-  intermediate matrix-vector multiplication results before summing them up. It creates huge memory
-  consumption in computational graph.
+* It's important to implement convolutions as **atomic operations**.<br>
+  Because we don't want to store all intermediate matrix-vector multiplication results 
+  before summing them up - as it creates huge memory consumption in computational graph.
+
+* If we flatten outputs $f$, we can rewrite the convolution $f = conv(x, W)$
+  as a **matrix-vector product** treating **inputs** $x$ as the vector:
+  
+  $f = conv(x, W) = \widehat{W} x$, where 
+
+  $x = (x_1, x_2, ..., x_m)^T$
+
+  $\widehat{W} = band(w_1, w_2, ..., w_{k \times k})$ is a **banded matrix** for a $k \times k$ filter $W$.
+
+* Using this version of convolution, we can derive partial derivative $\dfrac{df}{dx}$ as:<br>
+  $\dfrac{df}{dx} = \dfrac{d \widehat{W} x}{dx} = \widehat{W}$
+
+  And the adjoint $\overline{x}$ is derived as follows:
+  
+  $\overline{x} = \dfrac{dy}{dx} = \dfrac{dy}{df} \dfrac{df}{dx} = \widehat{W}^T \dfrac{dy}{df}$
+
+  $\widehat{W}^T = band(w_{k \times k}, ..., w_2, w_1)$ - 
+  is also a banded matrix, but with reverse order of diagonals.
+  
+  * Based on that we can **represent adjoint $\overline{x}$ as convolution** 
+    of incoming gradient $\dfrac{dy}{df}$ with a flipped filter (flipped order of filter-values):
+  
+    $\overline{x} = \widehat{W}^T \dfrac{dy}{df} = conv(\dfrac{dy}{df}, flip(W))$
+
+    i.e. **multiplying by the transpose of a convolution is equivalent 
+    to convolving with a flipped version of the filter.**
+
+  * And we don't even need to construct and store either of $\widehat{W}$ and $\widehat{W}^T$ matrices.<br>
+    It would also be impractical because these matrices contain a lot of 0s.
+
+
+* To compute another adjoint, $\overline{W}$, we can similarly rewrite the convolution as a matrix-vector
+  product, now treating the **filter** as a vector (instead of treating input as a vector, like previously)
+  and expanding $x$ vector to a $\widehat{X}$ matrix using **im2col** operation:
+
+  $f = conv(x, W) = \widehat{X} w$
+
+  $\dfrac{df}{dW} = \widehat{X}$
+
+  * Matrix $\widehat{X}$ is much more dense compared to a $\widehat{W}$
+  * And it turns out that in many cases the most efficient way to implement convolultions
+    is to first explicity construct $\widehat{X}$ im2col matrix 
+    and then perform the convolution as a matrix-matrix product 
+    $f = conv(x, W) = \widehat{X} w$
+  * Matrix $\widehat{X}$ has duplicated values from $x$ (e.g. multiple copies of $x_1$).<br>
+    And it often ends up been worthwhile to duplicate the memory 
+    for the sake of been a bit more efficient 
+    when it comes to the computations of matrix-matrix multiplication. 
+  * We want to create $\widehat{X}$ matrix in convolutional operator (in `ops`) 
+    instead of in Computational graph (in a `Layer`) 
+    to avoid creating a lot of memory for redundand nodes.
+
+* To implement convolutions properly we first need to understand 
+  how matrices and vectors and tensors are stored in memory.<br>
+  Convolutions may be implemented efficiently by manipulating stride operations 
+  in the internal representation of matrices.
+
+### Questions:
+* There are 2 ways to represent convolutions:
+  * as a matrix-vector product, when we use sum of matrix multiplications to calculate each separate "pixel" of output.
+    all channels are processed at single matrix multiplication.<br>
+    described in "elements of practical convolutions"
+  * as matrix-vector product when we process single (input channel, output channel) pair at a time.<br>
+    described in "differentiating" section
+  
+  When to used each of them? It was mentioned that both of them are effective.
+
+
+<a id="lec11"></a>
+
+## [Lecture 11](https://www.youtube.com/watch?v=es6s6T1bTtI) - Hardware Acceleration
+
+* TODO
