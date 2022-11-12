@@ -6,10 +6,13 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Course main page](https://dlsyscourse.org/)
 * [YouTube channel](https://www.youtube.com/channel/UC3-KIvmiIaZimgXMNt7F99g)
 
-# Table of Contents:
+# Table of Contents
 * Lecture 3
   * [Part I - "Manual" Neural Networks](#lec3-1)
-* [Lecture 6 - Fully connected networks, optimization, ](#lec6)
+  * [Part II - "Manual" Neural Networks](#lec3-2)
+* [Lecture 4 - Automatic Differentiation](#lec4)
+* [Lecture 5 - Automatic Differentiation Implementation](#lec5)
+* [Lecture 6 - Fully connected networks, optimization, initialization](#lec6)
 * [Lecture 7 - Neural Network Abstractions](#lec7)
 * [Lecture 8 - Neural Network Library Implementation](#lec8)
 * [Lecture 9 - Normalization and Regularization](#lec9)
@@ -68,12 +71,33 @@ Can we remove this constraint by not specifying activation function explicitly
 and let NN decide what activation function to use?
 
 
+<a id="lec3-2"></a>
+
 ## [Lecture 3 (Part II)](https://www.youtube.com/watch?v=JLg1HkzDsKI) - "Manual" Neural Networks
 * TODO: add general formula to compute gradients of multilayer feedworward network
 
 
+<a id="lec4"></a>
+
 ## [Lecture 4](https://www.youtube.com/watch?v=56WUlMEeAuA) - Automatic Differentiation
 
+* **Partial derivatives** with respect to same parameter vary in dimensions depending on 
+  what variable is been differentiated:
+
+  For example, $x \in \mathbb{R}^m,\ W \in \mathbb{R}^{m, n},\ f = x W \in \mathbb{R}^n$
+
+  $y = y(f) \in \mathbb{R}$ - a scalar valued function. Thus $\dfrac{dy}{df} \in \mathbb{R}^n$
+  
+  $\dfrac{df}{dx} = W^T \in \mathbb{R}^{n,m}$
+
+  $\dfrac{dy}{dx} = \dfrac{dy}{df} \dfrac{df}{dx} = \dfrac{dy}{df} W^T \in \mathbb{R}^m$
+
+  $shape(\dfrac{dy}{dx}) = shape(x)$
+  
+  $shape(\dfrac{df}{dx}) \ne shape(x)$
+
+
+<a id="lec5"></a>
 
 ## [Lecture 5](https://www.youtube.com/watch?v=cNADlHfHQHg) - Automatic Differentiation Implementation
 
@@ -495,11 +519,52 @@ and let NN decide what activation function to use?
 <a id="lec10"></a>
 
 ## [Lecture 10](https://www.youtube.com/watch?v=-5RPPjn0hPg) - Convolutional Networks 
+
+### Elements of practical convolutions
+
 * Drawbacks of using Fully Connected Layers for images:
   * A LOT of parameters per single layers
   * FCN do not capture image invariants (objects, patterns). 
     A slight shift of image by 1 pixel might lead to completely different activations
 * One of dominant ideas in modern Deep Learning is to 
-  choose such types of architectures that kind of preserve 
-  initial structure of data. Like convolutions help to preserve image structure and invariances
-* Convolutions in DL and Signal processing mean different things
+  choose such types of architectures that preserve 
+  initial structure of data. For example, convolutions help to preserve image structure and invariances.
+* Convolutions in DL and Signal Processing mean different things.
+  Signal Processnig analog for "convolution" in Deep Learning is "correlation".
+* Multi-channel convolutions contain a convolutional filter for
+  **each input-output channel pair**. Single output channel is sum
+  of convolutions over all input channels
+* A better view on convolutions is to view:
+  * each input "pixel" as a vector with len = number input channels
+  * each output "pixel" as a vector with len = number output channels
+  * each filter "pixel" as a matrix 
+    $W_{i,j} \in \large \mathbb{R}^{c_{in} \times c_{out}}$
+  * output "pixel" vector is calculated as **matrix-vector product**:<br>
+    $\large z_{i,j} = [k=3] = x_{i-1,j-1} W_{i-1, j-1} + x_{i-1,j} W_{i-1, j} + ... + x_{i+1,j+1} W_{i+1, j+1}$
+* Such way of thinking helps to represent a single convolution as a set of
+  $k \times k$ matrix multiplications, and their result is then summed. This helps to
+  implement convolutions (makes it easier to parallelize? TODO)
+* Usually, only odd-sized filters are used. Because it's more convenient
+  to calculate output shapes, padding size compared to even-sized filters.
+* To build high level representations and reduce computations we often 
+  want to reduce image resolution (H x W). This is usually achieved with
+  the help of **Pooling** and **Strided Convolutions**
+* There are cases when convolutions still have large number of parameters -
+  e.g. when there is large number of input or output channels.
+  This can lead to overfitting + slow computations.<br>
+  In this cases **Grouped Convolutions** are used - groups of channels in
+  output depend only on corresponding groups of input channels 
+  (equivalently, enforce filter weight matrices to be **block-diagonal**).<br>
+  An extreme case of Grouped Convolutions are **Depth-wise Convolustions** -
+  single input channel maps to a single output channel.
+* Convolutions have a relatively small **receptive field** size.
+  It's the key idea of convolutions (we analyze only part of input image),
+  but sometimes it poses a problem and we want to increase receptive field.<br>
+  This could be done with **Dilations** - filter points get spread out.<br>
+  However, dilations are less used these days - people tend to use 
+  **concatenation to patches** instead
+
+### Differentiating
+* It's important to implement convolutions as **atomic operations**. Because we don't want to store all
+  intermediate matrix-vector multiplication results before summing them up. It creates huge memory
+  consumption in computational graph.
