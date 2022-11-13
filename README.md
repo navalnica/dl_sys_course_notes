@@ -649,4 +649,60 @@ and let NN decide what activation function to use?
 
 ## [Lecture 11](https://www.youtube.com/watch?v=es6s6T1bTtI) - Hardware Acceleration
 
-* TODO
+* Each type of runtime device (cpu, gpu, tpu, mobile, etc.) requires individual tensor linear algebry library
+* Next we will describe main optimization techniques used for efficient computations
+### Vectorization
+* Leverages vector registers to load contiguous blocks of memory.<br>
+  e.g. `load_float4` can load 4 contiguous blocks of float values.
+* Requires arguments to be alligned to fixed length. because we read in blocks.
+* That requires to allocate memory for intermediate computations in aligned way as well. The memory must be aligned both to:
+  * platform word size (8 bytes for 64-bit platform)
+  * and to the block size used in vectorized computations
+
+### Data layout and strides
+
+* CPU requires data to be stored in flat way (1D array)
+* To store multidimensional arrays we need to flatten them
+* Orders:
+  * Row major: `A[i, j] = A[i * A.shape[1] + j]`
+  * Column major: `A[i, j] = A[j * A.shape[0] + i]`
+  * **Strides format**: `A[i, j] = A[i * A.strides[0] + j * A.strides[1]]`<br>
+    More general order: row major and column major can be derived from strides format.<br>
+    Also **generalizes well to a mutli-dimensional arrays**.
+* Strides format:
+  * Advantages. Can easily perform:
+    * Slice: change the begin offset and shape
+    * Transpose: swap the strides
+    * Broadcast: insert a stride equals 0
+  * Disadvantages: memory access no longer continuous
+    * Makes vectorization harder
+    * Many linear algebra operations may require compact (make continuous?) the array first
+
+### Parallelization
+
+* Executes the computation on multiple threads
+* OpenMP is an example of parallelization framework
+
+### Matrix multiplication 
+* Many libraries use same vanilla $O(n^3)$ algorithm 
+  but apply optimization techniques to make computations efficient
+* Depending on where the data resides, 
+  the time cost of fetching the data can be very different.<br>
+  [Latency Numbers Every Programmer Should Know ](https://gist.github.com/jboner/2841832)<br>
+  Access to DRAM (200ns) is 400 times slower than acces to L1 Cache (0.5 ns)
+* First optimization of vanilla MM implementation is **Register tiling**.<br>
+  It decreases number of DRAM accesses 
+  and increases number of registers usage.
+* Another optimization is **Cache line aware tiling**.<br>
+  * Prefetch line blocks in L1 cache. No registers are used.
+  * Compute dot product for each row pairs of prefetched line blocks.
+    This could be done using Regitster tiling as above (leveraging registers that load data from L1 cache now)
+* Combine them together: Cache line aware tiling + internal Register tiling
+* Besides parallelizaiton and vectorization we can speed up computations
+  by **reusing data** during computations 
+  instead of performing same data loads in different places.<br>
+  For instance, in Cache line aware tiling we reuse same matrix rows.<br>
+* We can analyse individual equations to find **possibilities to perform tiling**.<br>
+  e.g. in the formula `C[i][j] = sum(A[i][k] * B[j][k], axis=k)`,<br>
+  access to `A` matrix is independent of `j` dimension of `B` matrix.<br>
+  So we can tile the `j` dimension by `v` and reuse A data `v` times.
