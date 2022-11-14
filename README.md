@@ -795,7 +795,8 @@ and let NN decide what activation function to use?
 
 * We will consider matrix multiplication 
   in a following transposed variant:<br>
-  $C = A^T B,\ C_{i,j} = \sum\limits_k A_{k,i} B_{k,j} $
+  $C = A^T B,\ C_{i,j} = \sum\limits_k A_{k,i} B_{k,j}$<br>
+  All matrices have $n \times n$ size.
 * Thread level: **Register Tiling**
 * Block level: **Shared Memory Tiling**
 
