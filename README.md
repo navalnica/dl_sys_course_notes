@@ -18,6 +18,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 9 - Normalization and Regularization](#lec9)
 * [Lecture 10 - Convolutional Networks](#lec10)
 * [Lecture 11 - Hardware Acceleration](#lec11)
+* [Lecture 12 - GPU Acceleration](#lec12)
 
 # Notes
 
@@ -684,16 +685,55 @@ and let NN decide what activation function to use?
 * OpenMP is an example of parallelization framework
 
 ### Matrix multiplication 
+
+* We will consider matrix multiplication
+  in a following transposed variant:<br>
+  $C = A B^T,\ C_{i,j} = \sum\limits_k A_{i,k} B_{j,k} $<br>
+  All matrices have $n \times n$ size.
 * Many libraries use same vanilla $O(n^3)$ algorithm 
   but apply optimization techniques to make computations efficient
 * Depending on where the data resides, 
   the time cost of fetching the data can be very different.<br>
   [Latency Numbers Every Programmer Should Know ](https://gist.github.com/jboner/2841832)<br>
   Access to DRAM (200ns) is 400 times slower than acces to L1 Cache (0.5 ns)
-* First optimization of vanilla MM implementation is **Register tiling**.<br>
-  It decreases number of DRAM accesses 
-  and increases number of registers usage.
-* Another optimization is **Cache line aware tiling**.<br>
+* Optimizations discussed in this lecture:
+  * Register tiling
+  * Cache line aware tiling
+  * Their combination
+* The **main trick** in optimization is:
+  * load the data
+  * store it on the fast memory
+  * **reuse it as much as possible**
+
+#### Register tiling 
+  * Decreases number of DRAM accesses 
+    and increases number of registers usage
+  * We split A into $v_1 \times v_3$ - sized blocks<br>
+    and B into $v_2 \times v_3$ - sized blocks.<br>
+    And for each `a, b` block pair we compute dot product 
+    `c = dot(a, b.T)` of size $v_1 \times v_2$
+    and add it to corresponding block in C matrix.
+  * `a, b, c` are stored in registers
+  * The dot product above may be computed using simple for loops
+  * Data load cost: $dramspeed \times (n^3/v_2 + n^3/v_1)$
+  * Number of registers used on each iteration: 
+    $v_1 v_3 + v_2 v_3 + v_1 v_2$
+  * Most of processors have limited number of registers.<br>
+    We want to have $v_1$ and $v_2$ as large as possible to reduce 
+    data loading costs,<br>
+    but we also need to make sure that total number of registers
+    does not exceed number of available registers.
+  * $v_3$ does not affect loading cost (number of operations).<br>
+    We can pick $v_3 = 1$ and then increase $v_1$ and $v_2$ 
+    as large as needed.<br>
+    Ususally we set $v_1 = v_2$, but sometimes
+    we need a bit of assymetry, 
+    if number of available registers is not a perfect square (?)
+  * The reason that memory loading cost is reduced is that
+    we **reuse** already loaded data.<br>
+    We reuse `a` $v_2$ times and reuse `b` $v_1$ times.
+
+#### **Cache line aware tiling**
   * Prefetch line blocks in L1 cache. No registers are used.
   * Compute dot product for each row pairs of prefetched line blocks.
     This could be done using Regitster tiling as above (leveraging registers that load data from L1 cache now)
@@ -706,3 +746,57 @@ and let NN decide what activation function to use?
   e.g. in the formula `C[i][j] = sum(A[i][k] * B[j][k], axis=k)`,<br>
   access to `A` matrix is independent of `j` dimension of `B` matrix.<br>
   So we can tile the `j` dimension by `v` and reuse A data `v` times.
+
+
+<a id="lec12"></a>
+
+## [Lecture 12](https://www.youtube.com/watch?v=jYCxVirq4d0) - GPU Acceleration
+
+* GPU was designed to perform a lot of identical operations using a lot of cores.<br>
+  CPU, however, is a general purpose compute device with smaller number of cores and larger Control units.
+* We are using CUDA's terminology. Usually there is a direct mapping between CUDA concepts and
+  other GPU programming models: opencl, sycl, metal
+* GPU operates under **Single instruction, multiple threads (SIMT)** paradigm.<br>
+  All the threads execute same code with different context (thread id, block id)
+* GPU computational model consists of 2 levels:
+  * Threads are grouped into **blocks**. 
+    Threads within same block have **shared memory**.
+  * Blocks are grouped into a **launch grid**.<br>
+    GPU kerner execution means launching the grid of thread blocks.
+* To launch a GPU kernel we still need a **host side of a code** (CPU side). Its main purposes:
+  * Call memory allocation on GPU
+  * Copy data from CPU to GPU (using PCIe bus, currently)
+  * Initializes number of thread blocks and number of threads per block
+  * Launch GPU kernel
+  * Copy result from GPU to CPU memory
+  * Release memory on GPU
+* PCIe bus introduces bottleneck to computations by limiting the speed of
+  data copy from GPU to CPU and vice versa. That's why we need to **keep
+  data on GPU as long as possible**!
+
+### GPU Memory Hierarchy
+
+* Each thread block can be mapped to a **Stream Multiple Processor** (SMP)
+  that contains multiple **computing cores**  
+* Each thread gets mapped to a single computing core 
+  within the Stream Multiple Processor
+* GPU memory hierarchy:
+  * There is a **global memory**
+  * Each thread block has **shared memory**
+  * Each thread has its own **registers**
+* We use shared memory to **reduce number of data loading operations** 
+  by each thread in a block by cooperatively fetching 
+  required data to a shared memory of a thread block.<br>
+  This helps to increase memory reuse across different threads.
+* **Cooperative fetching** means that each thread in a block
+  loads only portion of all shared data.
+
+### Matrix multiplication on GPU
+
+* We will consider matrix multiplication 
+  in a following transposed variant:<br>
+  $C = A^T B,\ C_{i,j} = \sum\limits_k A_{k,i} B_{k,j} $
+* Thread level: **Register Tiling**
+* Block level: **Shared Memory Tiling**
+
+#### TODO. Finalize notes on Matrix Multiplication, cooperative fetching, other optimization techniques
