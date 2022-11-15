@@ -19,6 +19,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 10 - Convolutional Networks](#lec10)
 * [Lecture 11 - Hardware Acceleration](#lec11)
 * [Lecture 12 - GPU Acceleration](#lec12)
+* [Lecture 13 - Hardware Acceleration Implemention](#lec13)
 
 # Notes
 
@@ -801,3 +802,19 @@ and let NN decide what activation function to use?
 * Block level: **Shared Memory Tiling**
 
 #### TODO. Finalize notes on Matrix Multiplication, cooperative fetching, other optimization techniques
+
+* [CUDA C++ Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html)
+
+
+<a id="lec13"></a>
+
+## [Lecture 13](https://www.youtube.com/watch?v=XdhUZRXA7fg) - Hardware Acceleration Implemention
+
+* Manipulating with array strides, shape and offset change **the view** of the data
+* To peroform calculations (e.g. element-wise addition) we need to use **compact()** function.<br>
+  It creates a new tensor from a specified view in order to perform operations correctly
+  and not change underlying data of the original view.
+* However, some operations in numpy and pytorch can work with arguments that are not contiguous in memory.
+  They do not call **compact()** function and work directly with strides.
+* In some cases it's usefull to explicitly call **compact()**.
+  For example for Matrix Multiplications or Convolutions it's helpful to use compacted (flattened) arrays
