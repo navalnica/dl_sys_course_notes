@@ -726,8 +726,8 @@ and let NN decide what activation function to use?
     does not exceed number of available registers.
   * $v_3$ does not affect loading cost (number of operations).<br>
     We can pick $v_3 = 1$ and then increase $v_1$ and $v_2$ 
-    as large as needed.<br>
-    Ususally we set $v_1 = v_2$, but sometimes
+    as large as needed.
+  * Ususally we set $v_1 = v_2$, but sometimes
     we need a bit of assymetry, 
     if number of available registers is not a perfect square (?)
   * The reason that memory loading cost is reduced is that
