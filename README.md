@@ -811,9 +811,12 @@ and let NN decide what activation function to use?
 ## [Lecture 13](https://www.youtube.com/watch?v=XdhUZRXA7fg) - Hardware Acceleration Implemention
 
 * Manipulating with array strides, shape and offset change **the view** of the data
-* To peroform calculations (e.g. element-wise addition) we need to use **compact()** function.<br>
+* To perform calculations (e.g. element-wise addition) 
+  we need to use **compact()** function.<br>
   It creates a new tensor from a specified view in order to perform operations correctly
   and not change underlying data of the original view.
+  * For example, to reshape a `x[0, ::3, 1:]` view of a (2,4,3)-tensor `x` we need to call:<br>
+  `x[0, ::3, 1:].compact().reshape((4,))`
 * However, some operations in numpy and pytorch can work with arguments that are not contiguous in memory.
   They do not call **compact()** function and work directly with strides.
 * In some cases it's usefull to explicitly call **compact()**.
