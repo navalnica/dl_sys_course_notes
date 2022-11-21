@@ -734,19 +734,26 @@ and let NN decide what activation function to use?
     we **reuse** already loaded data.<br>
     We reuse `a` $v_2$ times and reuse `b` $v_1$ times.
 
-#### **Cache line aware tiling**
+#### Cache line aware tiling
   * Prefetch line blocks in L1 cache. No registers are used.
   * Compute dot product for each row pairs of prefetched line blocks.
     This could be done using Regitster tiling as above (leveraging registers that load data from L1 cache now)
 * Combine them together: Cache line aware tiling + internal Register tiling
+
+#### Data reuse patterns
 * Besides parallelizaiton and vectorization we can speed up computations
-  by **reusing data** during computations 
-  instead of performing same data loads in different places.<br>
-  For instance, in Cache line aware tiling we reuse same matrix rows.<br>
-* We can analyse individual equations to find **possibilities to perform tiling**.<br>
-  e.g. in the formula `C[i][j] = sum(A[i][k] * B[j][k], axis=k)`,<br>
-  access to `A` matrix is independent of `j` dimension of `B` matrix.<br>
-  So we can tile the `j` dimension by `v` and reuse A data `v` times.
+  by **reusing data** during computations.
+  * It helps to avoid loading the same data in different places
+  * We can also copy data that is being reused to a faster memory to speed up data read/writes
+* We can analyse individual equations to find **possibilities to perform tiling**
+  * For example, in Cache line aware tiling we reuse same matrix rows
+  * And in inner matrix multiplication operation: `C[i][j] = sum(A[i][k] * B[j][k], axis=k)`<br>
+    access to `A` matrix is independent of `j` dimension of `B` matrix.<br>
+    So we can tile the `j` dimension of B matrix by `v` and reuse A data `v` times<br>
+    (the exact same thing that I come up with during Homework 3 😅. `(i -> k -> j)` order of loops.)
+  * It helps to look for missing iterators to find tiling and memory reuse possibilities.<br>
+    e.g. in `C[i][j] = sum(A[i][k] * B[j][k], axis=k)` example from above<br>
+    for `A[i][k]` the missing iterator is `j` and for `B[j][k]` the missing iterator is `i`.
 
 
 <a id="lec12"></a>
