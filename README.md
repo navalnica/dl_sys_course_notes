@@ -778,9 +778,9 @@ and let NN decide what activation function to use?
   * Launch GPU kernel
   * Copy result from GPU to CPU memory
   * Release memory on GPU
-* PCIe bus introduces bottleneck to computations by limiting the speed of
-  data copy from GPU to CPU and vice versa. That's why we need to **keep
-  data on GPU as long as possible**!
+* Data transfer from host to device and vice versa takes a lot of time!<br>
+  PCIe bus introduces bottleneck by limiting the speed of memory copy between GPU and CPU.<br>
+  That's why we need to **keep data on GPU as long as possible**!
 
 ### GPU Memory Hierarchy
 
