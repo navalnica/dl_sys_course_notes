@@ -855,7 +855,10 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   than a thread block.
 * Tensor Core<br>
   Another type of acceleration unit.
+
+#### CUDA learning resources:
 * [CUDA C++ Programming Guide](https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html)
+* [Slides. CUDA C/C++ Basics. Supercomputing 2011 Tutorial](https://www.nvidia.com/docs/IO/116711/sc11-cuda-c-basics.pdf)
 
 
 <a id="lec13"></a>
