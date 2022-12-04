@@ -944,6 +944,8 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   by manipulating underlying memory using strides and shapes.<br>
   Here are [nice examples](https://towardsdatascience.com/advanced-numpy-master-stride-tricks-with-25-illustrated-exercises-923a9393ab20) to illustrate the point.
 * im2col constructs a tensor by using $O(K^2)$ more memory than the original image, which can be quite costly for large kernel sizes.
+
+#### Implementation
 * The main idea: im2col -> reshape (makes tensor to be contiguous in memory, duplicates required tensor elements) ->
   matrix multiplication -> reshape:
   ```python
