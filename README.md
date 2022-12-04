@@ -555,7 +555,7 @@ and let NN decide what activation function to use?
     $\large z_{i,j} = [k=3] = x_{i-1,j-1} W_{i-1, j-1} + x_{i-1,j} W_{i-1, j} + ... + x_{i+1,j+1} W_{i+1, j+1}$
 * Such way of thinking helps to represent a single convolution as a set of
   $k \times k$ matrix multiplications, and their result is then summed.<br>
-  This **helps to implement convolutions** (in what way? next sections tells that we are using atomic operations. TODO)
+  This **helps to implement convolutions**
 * Usually, only odd-sized filters are used. Because it's more convenient
   to calculate output shapes, padding size compared to even-sized filters.
 * To build high level representations and reduce computations we often 
@@ -593,17 +593,17 @@ and let NN decide what activation function to use?
 * Using this version of convolution, we can derive partial derivative $\dfrac{df}{dx}$ as:<br>
   $\dfrac{df}{dx} = \dfrac{d \widehat{W} x}{dx} = \widehat{W}$
 
-  And the adjoint $\overline{x}$ is derived as follows:
+  And the adjoint $\large \overline{x}$ is derived as follows:
   
-  $\overline{x} = \dfrac{dy}{dx} = \dfrac{dy}{df} \dfrac{df}{dx} = \widehat{W}^T \dfrac{dy}{df}$
+  $\large \overline{x} = \dfrac{dy}{dx} = \dfrac{dy}{df} \dfrac{df}{dx} = \widehat{W}^T \dfrac{dy}{df}$
 
   $\widehat{W}^T = band(w_{k \times k}, ..., w_2, w_1)$ - 
   is also a banded matrix, but with reverse order of diagonals.
   
-  * Based on that we can **represent adjoint $\overline{x}$ as convolution** 
+  * Based on that we can **represent adjoint $\large \overline{x}$ as convolution** 
     of incoming gradient $\dfrac{dy}{df}$ with a flipped filter (flipped order of filter-values):
   
-    $\overline{x} = \widehat{W}^T \dfrac{dy}{df} = conv(\dfrac{dy}{df}, flip(W))$
+    $\large \overline{x} = \widehat{W}^T \dfrac{dy}{df} = conv(\dfrac{dy}{df}, flip(W))$
 
     i.e. **multiplying by the transpose of a convolution is equivalent 
     to convolving with a flipped version of the filter.**
@@ -612,7 +612,7 @@ and let NN decide what activation function to use?
     It would also be impractical because these matrices contain a lot of 0s.
 
 
-* To compute another adjoint, $\overline{W}$, we can similarly rewrite the convolution as a matrix-vector
+* To compute another adjoint, $\large \overline{W}$, we can similarly rewrite the convolution as a matrix-vector
   product, now treating the **filter** as a vector (instead of treating input as a vector, like previously)
   and expanding $x$ vector to a $\widehat{X}$ matrix using **im2col** operation:
 
