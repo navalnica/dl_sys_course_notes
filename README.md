@@ -1002,7 +1002,8 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 * Training N-layer network requires $O(N)$ memory without any optimizations.
   The reason is that intermediate activation values being used 
   during backward pass.
-* **Activation checkpointing** (or simply **checkpointing**, or **re-materialization technique**)
+* **Activation checkpointing** (or simply **checkpointing**, or **re-materialization technique**) helps to 
+  reduce amount of memory needed to run training.
   * The idea is that we save (checkpoint) only a portion of intermediate activations during a forward pass
   * While doing backward pass we recompute only the needed portion of intermediate activations starting from the 
     last checkpoint available.<br>
