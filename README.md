@@ -1011,10 +1011,10 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   * If we checkpoint only each K-th intermediate activation, the overall memory cost has following bound:<br>
     $O(N/K) + O(K)$. checkpoint cost + re-computation cost
   * If we choose $K = \sqrt{N}$, then we get sublinear memory cost: $O(\sqrt{N})$
-  * However, recomputations introduces additional computations. We are in fact computing forward pass once again
-    (2 times in total) during recomputation (from one checkpoint to other)
+  * However, recomputations introduce additional computations. We are in fact computing forward pass once again
+    (2 times in total) during recomputation (between each pair of successive checkpoints).
   * we can choose only to recompute relatively cheap layers (ReLU, Linear) 
-    as opposed to more computational heavy layers (matrix multiplication, convolution). 
+    as opposed to more computationaly heavy layers (matrix multiplication, convolution). 
     In this case memory saving will be less, but the compute will take less time.
 
 ### Parallel and distributed training
