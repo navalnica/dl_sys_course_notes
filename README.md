@@ -22,6 +22,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 12 - GPU Acceleration](#lec12)
 * [Lecture 13 - Hardware Acceleration Implemention](#lec13)
 * [Lecture 14 - Implementing Convolutions](#lec14)
+* [Lecture 15 - Training Large Models](#lec15)
 
 # Notes
 
@@ -981,3 +982,39 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 * I guess it's easier to add padding when treating convolutions as single matrix multiplication via im2col
 * TODO: What happens to gradients computation if we use multi-channel version of im2col? They should remain the same.
   Need to derive them and check.
+
+
+<a id="lec15"></a>
+
+## [Lecture 15](https://www.youtube.com/watch?v=HSzVogM5IPo) - Training Large Models
+
+* Main sources of memory consumption:
+  * Model weights
+  * Optimizer states
+  * Intermediate activation values (used during backward pass)
+
+### Techniques for memory saving
+* For inference we need only $O(1)$ memory to compute the result. We don't need to keep track of intermediate
+  activation values. And in fact we can use only 2 memory buffers (for simple case, e.g. without skip connections): 
+  buffer A to store `x` and buffer B to store `f(x)`. Then we write `f(x)` to A and `g(f(x))` to B and proceed. 
+  For more complex cases, due to locality of intermediate activation nodes dependencies, we still can perform
+  inference with a constant memory usage.
+* Training N-layer network requires $O(N)$ memory without any optimizations.
+  The reason is that intermediate activation values being used 
+  during backward pass.
+* **Activation checkpointing** (or simply **checkpointing**, or **re-materialization technique**)
+  * The idea is that we save (checkpoint) only a portion of intermediate activations during a forward pass
+  * While doing backward pass we recompute only the needed portion of intermediate activations starting from the 
+    last checkpoint available.<br>
+    For that we use additional memory buffer.
+  * If we checkpoint only each K-th intermediate activation, the overall memory cost has following bound:<br>
+    $O(N/K) + O(K)$. checkpoint cost + re-computation cost
+  * If we choose $K = \sqrt{N}$, then we get sublinear memory cost: $O(\sqrt{N})$
+  * However, recomputations introduces additional computations. We are in fact computing forward pass once again
+    (2 times in total) during recomputation (from one checkpoint to other)
+  * we can choose only to recompute relatively cheap layers (ReLU, Linear) 
+    as opposed to more computational heavy layers (matrix multiplication, convolution). 
+    In this case memory saving will be less, but the compute will take less time.
+
+### Parallel and distributed training
+* TODO
