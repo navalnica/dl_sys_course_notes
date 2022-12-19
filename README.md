@@ -1127,12 +1127,12 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   probably because LSTM itself is a bit confusing.
 * for example, pytorch documentation provides a separate equation
   to compute each of the LSTM's intermediate terms
-* but in reality intermediate terms computation could be written as a single equation:<br>
-  ```math
-  \begin{bmatrix} i_t \\ f_t \\ g_t \\ o_t \end{bmatrix} = 
-  \begin{bmatrix} sigmoid \\ sigmoid \\ tanh \\ sigmoid \end{bmatrix}
-  (W_{hh}h_{t-1} + W_{hx}x_t + b_h)
-  ```
+* but in reality intermediate terms computation could be written as a single equation:
+```math
+\begin{bmatrix} i_t \\ f_t \\ g_t \\ o_t \end{bmatrix} = 
+\begin{bmatrix} sigmoid \\ sigmoid \\ tanh \\ sigmoid \end{bmatrix}
+(W_{hh}h_{t-1} + W_{hx}x_t + b_h)
+```
 * where:
   * $i_t \in \mathbb{R}^d$ - input gate
   * $f_t \in \mathbb{R}^d$ - forget gate
