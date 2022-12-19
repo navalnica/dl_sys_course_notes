@@ -23,6 +23,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 13 - Hardware Acceleration Implemention](#lec13)
 * [Lecture 14 - Implementing Convolutions](#lec14)
 * [Lecture 15 - Training Large Models](#lec15)
+* [Lecture 18 - Sequence Modeling and Recurrent Networks](#lec18)
 
 # Notes
 
@@ -1019,3 +1020,187 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 
 ### Parallel and distributed training
 * TODO
+
+
+<a id="lec18"></a>
+
+## [Lecture 18](https://www.youtube.com/watch?v=aI47BqLYahc) - Sequence Modeling and Recurrent Networks
+
+### Sequence modeling
+* in classification and regression tasks we used an assumption that data pairs $x^{(i)}, y{(i)}$ 
+  are independent identically distributed (i.i.d.)<br>
+  that means we can freely rearrage data sample during training - exactly what we do during shuffling and batching
+* for sequence modeling this i.i.d. assumption does not hold. data points have to be processed in strict order.<br>
+* besides, in sequence modeling we use a special type of models that make use of the sequential nature
+  of input data to get better quality of predictions
+* a good example of a sequence modeling task: Part of speech tagging (POS-tagging)<br>
+  consider sentence: "The quick brown fox jumped well"<br>
+  we can't determine POS for the word "well" without using previous context. 
+  it could be either an adverb (like in this case) or a noun (a well in the ground)
+* a POS-tagging is a good example of when sequence modeling not only improves the model performance
+  by using temporal dependence, but it's also crucial for predicting at all. 
+  without temporal dependence there is no way of predict POS labels
+* another good example of sequence problem is speech-to-text (STT)
+* in auto-regressive prediction task we predict next element in the sequence based on previous sequence items.
+  examples: language modeling, time series forecasting
+* not all sequence prediction is auto-regressive. 
+  auto-regressive prediction is one particular example of sequence prediction
+
+
+### Recurrent neural networks
+* Recurrent neural networks were built to model the temporal nature
+  of input sequences and the way they are handled by humans
+* RNN uses **hidden states** to keep track of all the inputs (context)
+  that it has seen so far
+* hidden state $h_t$ is computed as a function of current inputs $x_t$
+  and previous hidden state $h_{t-1}$:<br>
+  $h_t = f(W_{hh}h_{t-1} + W_{hx}x_{t} + b_h)$
+* the output is computed from the hidden state only:<br>
+  $y_t = g(W_{yh}h_t + b_y)$
+* where $f$ and $g$ are a non-linear activation functions<br>
+  and $b_h$ and $b_y$ are bias terms
+* if RNN is trained successfully, hidden state $h_t$ should capture
+  all the previous context and should be able to successfully model
+  current output $y_t$
+* the first hidden state of RNN, $h_0$, should be initialized in some way
+
+#### Backpropagation through time
+* for RNNs gradient computation, similar to a forward pass, is recursive.
+  model parameters: $W_{hh}, W_{hx}, W_{yh}, b_{h}, b_{y}$ are used
+  to compute each of $y_t$. that's why to compute the gradients we need
+  to unroll the whole RNN. thanks to automatic differentiation tools
+  we can do this automatically. and this process is named
+  **Backpropagation through time (BPTT)**
+
+#### Stacking RNNs
+* RNNs can be stacked together treating the hidden unit of one layer 
+  as the input to the following layer.<br>
+* RNN Stacking does not change the temporal structure of the network:
+  $y_t$ is still a funtion of $x_i, i = \overline{1,t}$ and $h_0$
+* In practice it tends to be less value in "very deep" stacked RNNs
+  compared to other NN architectures
+
+#### Exploding or vanishing of activations/gradients
+* Unlike MLP, where the case of a deep network (e.g. 50 layer MLP)
+  was quite artificial and was used to demonstrate the point of 
+  the need ofnormalization, RNNs are very naturally going to be that deep
+  (in temporal dimension), 
+  because input sequences could be arbitrarily long
+* Thus, RNNs require proper initialization 
+  to avoid exploding or vanishing of activations or gradients
+* Even if we happen to initialize hidden RNN params in such a way
+  that actiavations do not explode or vanish, 
+  activations get changed during gradient update.
+  This leads us again to the problem of exploding / vanishing 
+  activations / gradients.
+* Possible solution would be to use such activation functions
+  that limit possible activation values: 
+  sigmoid (from 0 to 1) or tanh (from -1 to 1).
+* but sigmoid and tanh have a problem 
+  of gradient becoming close to 0 (vanishing gradients)
+  if activatuion gets into a saturation region 
+  (close to 0 or 1 for sigmoid and close to -1 or 1 for tanh)
+* however using only sigmoid or tanh does not help :)<br>
+  we need something more to avoid exploding / vanishing
+
+
+### LSTMs
+* Long Short Term Memory RNN
+* **LSTM cells** are a particular form of hidden unit update 
+  that avoids **(some of)** the problems of vanilla RNNs
+* one of the first RNNs types that successfully overcome problem of 
+  exploding/vanishing activations/gradients
+* hidden states are divided into **two components**
+  that have different update rules:
+  * $c_t$ - **cell state**
+  * $h_t$ - **hidden state** (not a good name though, because both
+    cell state and a hidden state are parts of LSTMs hidden state 🙂)
+  * there are other elements (gates) in update rules but they are intermediate terms
+* idea of LSTM is that we:
+  * control the magnitude of inputs using activation functions
+  * control whether to preserve information of previous context
+* however, some update rules and components of LSTM hidden state
+  could be simplified
+
+#### Update rules
+* ofther LSTM is explained in a confusing way. 
+  probably because LSTM itself is a bit confusing.
+* for example, pytorch documentation provides a separate equation
+  to compute each of the LSTM's intermediate terms
+* but in reality intermediate terms computation could be written as a single equation:<br>
+  $\begin{bmatrix} i_t \\ f_t \\ g_t \\ o_t \end{bmatrix} = 
+  \begin{bmatrix} sigmoid \\ sigmoid \\ tanh \\ sigmoid \end{bmatrix}
+  (W_{hh}h_{t-1} + W_{hx}x_t + b_h)
+  $
+  * $i_t \in \mathbb{R}^d$ - input gate
+  * $f_t \in \mathbb{R}^d$ - forget gate
+  * $g_t \in \mathbb{R}^d$ - gate gate (?)
+  * $o_t \in \mathbb{R}^d$ - output gate
+  * $W_{hh} \in \mathbb{R}^{4d \times d}$
+  * $h_{t-1} \in \mathbb{R}^d$
+  * $W_{hX} \in \mathbb{R}^{4d \times n}$
+  * $x_{t} \in \mathbb{R}^n$
+* $sigmoid: \mathbb{R} \rightarrow [0,1]$,<br>
+  $tanh: \mathbb{R} \rightarrow [-1,1]$
+* next we update LSTM hidden state components using computed intermediate terms:
+  * $c_t = c_{t-1} \circ f_t + i_t \circ g_t$
+  * $h_t = tanh(c_t) \circ o_t$
+
+#### Intuition
+* cell state update is more important compared to hidden state update.
+* cell state preserves the information of past context and
+  forget gate controls amount of previous 
+  context information to preserve
+* using this combination of cell state and forget gate
+  allows to preserve information about previous context 
+  for arbitrary long (if forget gate is saturated, i.e. close to 1)
+* cell state value is then bounded using `tanh`
+  activation and output gate controls how much of this information 
+  to keep as the final value of a hidden state
+* this allows for LSTMs to avoid 
+  vanishing gradient problem for a wide(r) range of weights 
+* going deeper into intuition behind LSTM is a kind of a loosing battle :)
+  LSTM is a bit overconfused and not perfect 
+  (again, it could be simplified). but LSTM works.
+
+#### Blog post
+* Andrej Karpathy's
+  [blog post](https://karpathy.github.io/2015/05/21/rnn-effectiveness) 
+  on RNN helped to popularize LSTMs
+* This example demonstrates that blog posts
+  do have impact on academic field!!! Not only academic papers are important, but other forms of information are as well.
+
+
+### Beyond "simple" sequential models
+* RNN can be treated as a module of a more complex architecture. 
+
+#### seq2seq models
+* example: text translation task
+* 2 RNNs are stacked together
+* 1st RNN (encoder) parses the whole input sequence and creates
+  a final hidden state - the summary of all past text.
+  no loss calculated during this stage
+* the 2nd RNN (decoder) takes the final hidden state 
+  of the 1st RNN as input
+  and generates (usually in an auto-regressive manner) the output seqence
+* when the <STOP> token is predicted, 2nd RNN stops predicting the output
+
+#### Bidirectional RNNs
+* RNNs can use only the sequence information up until time $t$
+  to predict $y_t$
+* sometimes it's undesirable and we want to use the whole sequence 
+  (incorporate both past and future information) to make predictions
+* good examples: language translation, POS-tagging
+* Bidirectional RNN: stack 2 RNNs. 
+  one running forward in time, 
+  the other running backward in time
+* removes temporal dependency when predicting outputs
+
+
+### Questions
+* in RNNs, why not to have a normalization layer (batch/layer/group norm) 
+  after each hidden unit? for MLP it helped to normalize inputs
+  for next layers. should probably work for RNNs. at least using
+  sigmoid or tanh as activation follows the same idea of normalizing
+  next layer inputs
+  * Answer: that is exactly what happens in LSTM
