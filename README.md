@@ -1133,6 +1133,7 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   \begin{bmatrix} sigmoid \\ sigmoid \\ tanh \\ sigmoid \end{bmatrix}
   (W_{hh}h_{t-1} + W_{hx}x_t + b_h)
   ```
+* where:
   * $i_t \in \mathbb{R}^d$ - input gate
   * $f_t \in \mathbb{R}^d$ - forget gate
   * $g_t \in \mathbb{R}^d$ - gate gate (?)
