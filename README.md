@@ -24,6 +24,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 14 - Implementing Convolutions](#lec14)
 * [Lecture 15 - Training Large Models](#lec15)
 * [Lecture 18 - Sequence Modeling and Recurrent Networks](#lec18)
+* [Lecture 19 - RNN Implementation](#lec19)
 
 # Notes
 
@@ -1206,3 +1207,38 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   sigmoid or tanh as activation follows the same idea of normalizing
   next layer inputs
   * Answer: that is exactly what happens in LSTM
+
+
+<a id="lec19"></a>
+
+## [Lecture 19](https://www.youtube.com/watch?v=q12VPh-bK7k) - RNN Implementation
+
+### Batching
+* We use batching (where each element in a batch is an independent sequence) to increase computations efficiency.
+* The reason is that without batching for each time step we would perform 2 matrix-vector multiplications:
+  $W_{hh} h_{t - 1} + W_{hi} x_t$. $h_t$ and $x_t$ are vectors
+* Matrix-vector multiplication is much slower than matrix-matrix multiplication, 
+  thus we combine inputs into batches and make $h_t$ and $x_t$ to be matrices
+* For LSTMs we break the convention of the order of input tensor dimension to make Matrix multiplication contiguous
+  * $L$ - sequence length, $n$ - input size, $d$ - hidden size, $b$ - batch size
+  * We use $x \in \mathbb{R}^{L \times b \times n}$ instead of $x \in \mathbb{R}^{b \times L \times n}$
+  * Reason is that inside LSTM we iterate over time steps and access $x_t$
+  * if `batch_first=False` than we get contiguous chunk of memory: $x_t$ = `x[t, :, :]`
+  * else we get non-contiguous chunk of memory: $x_t$ = `x[:, t, :]`
+
+### Backpropagation through time
+* To avoid running out of memory during training RNN on long sequences, we use 
+  **Truncated Backpropagation Through Time** (TBPTT)
+* Input sequence is split into chunks. Each chunk is then passed through RNN to compute loss and update model params
+* Without TBPTT we would create inappropriately large computational graph that will consume all the memory
+* To preserve information about previous sequence chunk we use **Hidden unit repackaging** (aka **Stop-gradient call**):
+  * we save last hidden state **value** (detached value, not the graph tensor. else we won't save any memory) 
+    obtained during previous sequence chunk processing
+  * and pass it to be initial value of RNN hidden state when processing next chunk
+* Hidden unit repackaging is the reason why pytorch returns `H, (hn, cn)` from LSTM
+* Input sequence could be split into chunks using different stride values (1, 2, ..., chunk_len)
+
+### Questions 
+* in [23:57](https://youtu.be/q12VPh-bK7k?t=1437) 
+  it was mentioned that matrix-vector multiplication is much slower than matrix-matrix multiplication. why?
+
