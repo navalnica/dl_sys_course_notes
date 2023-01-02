@@ -29,6 +29,7 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 17 - Generative Adversarial Networks Implementation](#lec17)
 * [Lecture 18 - Sequence Modeling and Recurrent Networks](#lec18)
 * [Lecture 19 - RNN Implementation](#lec19)
+* [Lecture 20 - Transformers and Attention](#lec20)
 
 # Notes
 
@@ -1271,3 +1272,16 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 * in [23:57](https://youtu.be/q12VPh-bK7k?t=1437) 
   it was mentioned that matrix-vector multiplication is much slower than matrix-matrix multiplication. why?
 
+
+<a id="lec20"></a>
+
+## [Lecture 20](https://www.youtube.com/watch?v=IFKRf-BAqZo) - Transformers and Attention
+* TODO
+* 42:30
+
+### Transofrmer block
+
+#### Causal dependency
+
+#### Positional encodings
+* 1:02:50
