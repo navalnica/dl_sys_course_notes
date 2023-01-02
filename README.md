@@ -8,6 +8,8 @@ Notes for CMU DL Systems Course (2022 online public run).
 * 📒 [Public jupyter notebooks from lectures](https://github.com/dlsyscourse/public_notebooks)
 
 # Table of Contents
+* [Lecture 1 - Introduction and Logistics](#lec1)
+* [Lecture 2 - ML Refresher / Softmax Regression](#lec2)
 * Lecture 3
   * [Part I - "Manual" Neural Networks](#lec3-1)
   * [Part II - "Manual" Neural Networks](#lec3-2)
@@ -23,10 +25,25 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 13 - Hardware Acceleration Implemention](#lec13)
 * [Lecture 14 - Implementing Convolutions](#lec14)
 * [Lecture 15 - Training Large Models](#lec15)
+* [Lecture 16 - Generative Adversarial Networks](#lec16)
+* [Lecture 17 - Generative Adversarial Networks Implementation](#lec17)
 * [Lecture 18 - Sequence Modeling and Recurrent Networks](#lec18)
 * [Lecture 19 - RNN Implementation](#lec19)
 
 # Notes
+
+
+<a id="lec1"></a>
+
+## [Lecture 1](https://www.youtube.com/watch?v=ftP5HeOvsI0) - Introduction and Logistics
+* TODO
+
+
+<a id="lec2"></a>
+
+## [Lecture 2](https://www.youtube.com/watch?v=MlivXhZFbNA) - ML Refresher / Softmax Regression
+* TODO
+
 
 <a id="lec3-1"></a>
 
@@ -1020,6 +1037,18 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
     In this case memory saving will be less, but the compute will take less time.
 
 ### Parallel and distributed training
+* TODO
+
+
+<a id="lec16"></a>
+
+## [Lecture 16](https://www.youtube.com/watch?v=iIx_8_pxzhs) - Generative Adversarial Networks
+* TODO
+
+
+<a id="lec17"></a>
+
+## [Lecture 17](https://www.youtube.com/watch?v=DmBw8SEeAc0) - Generative Adversarial Networks Implementation
 * TODO
 
 
