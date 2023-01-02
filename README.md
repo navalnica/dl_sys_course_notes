@@ -30,6 +30,9 @@ Notes for CMU DL Systems Course (2022 online public run).
 * [Lecture 18 - Sequence Modeling and Recurrent Networks](#lec18)
 * [Lecture 19 - RNN Implementation](#lec19)
 * [Lecture 20 - Transformers and Attention](#lec20)
+* [Lecture 21 - Transformer Implementation](#lec21)
+* [Lecture 23 - Model Deployment](#lec23)
+* [Lecture 24 - Machine Learning Compilation and Deployment Implementation](#lec24)
 
 # Notes
 
@@ -1285,3 +1288,21 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 
 #### Positional encodings
 * 1:02:50
+
+
+<a id="lec21"></a>
+
+## [Lecture 21](https://www.youtube.com/watch?v=OzFmKdAHJn0) - Transformer Implementation
+* TODO
+
+
+<a id="lec23"></a>
+
+## [Lecture 23](https://www.youtube.com/watch?v=jCBrUisBQ0A) - Model Deployment
+* TODO
+
+
+<a id="lec24"></a>
+
+## [Lecture 24](https://www.youtube.com/watch?v=HIwsCzdW_pw) - Machine Learning Compilation and Deployment Implementation
+* TODO
