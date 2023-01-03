@@ -204,21 +204,22 @@ and let NN decide what activation function to use?
 * It's really important where you start, what initialization use
 * Differences in weights initialization with subsequent optimization can far outweight the differences in weights optimization alone.
 * After optimization model weights often stay relatively close to their initialization values.
-* **Kaiming initizalition**: $w_{i}\sim\mathcal{N}(0; \frac{2}{n_{i}})$, where $n_i$ is the size of individual actication on layer $i$<br>
+* **Kaiming normal initizalition**: 
+  $w_{i}\sim\mathcal{N}(0; \frac{2}{n_{i}})$, where $n_i$ is the size of individual actication on layer $i$<br>
   When **ReLU is a non-linearity function**, Kaiming initialization ensures that $z_i \sim \mathcal{N}(0, 1)$ for each hidden layer.<br>
   Derivation for element of activation matrix:<br>
   
   $z_i \sim \mathcal{N}(0,I_{n_i}),\ z_i \in \mathbb{R}^{n_i}$ - activation vector<br>
   
-  $\large w_i \sim \mathcal{N}(0,\frac{2}{n} I_{n_i}),\ w_i \in \mathbb {R}^{n_i}$ - parameter vector <br>
+  $\large w_i \sim \mathcal{N}(0,\frac{2}{n_i} I_{n_i}),\ w_i \in \mathbb {R}^{n_i}$ - parameter vector <br>
   
-  $\large Var(w_i z_i) = Var(\sum\limits^{n}\limits_{k=1}{w_{i, k} z_{i, k}}) = [w_i \text{ and } z_i \text{ are independent}] = n Var(w_{i,k}) Var(z_{i,k}) = n \frac{2}{n} 1 = 2$ <br>
+  $\large Var(w_i z_i) = Var(\sum\limits^{n_i}\limits_{k=1}{w_{i, k} z_{i, k}}) = [w_i \text{ and } z_i \text{ are independent}] = n_i Var(w_{i,k}) Var(z_{i,k}) = n_i \frac{2}{n_i} 1 = 2$ <br>
   
   ReLU operation keeps only positive values in the sum - approximately half of values for vector from gaussian. Thus:<br>
   
-  $Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum\limits^{n}\limits_{k=1}{w_{i, k} z_{i, k}})) = \frac{n}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n}{2} \frac{2}{n} 1 = 1$<br>
+  $Var(\large z_{i+1}) = Var(ReLU(w_i z_i)) = Var(ReLU(\sum\limits^{n_i}\limits_{k=1}{w_{i, k} z_{i, k}})) = \frac{n_i}{2} Var(w_{i,k}) Var(z_{i,k}) = \frac{n_i}{2} \frac{2}{n_i} 1 = 1$<br>
   
-  $\mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum\limits^{n}\limits_{k=1} ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = \sum\limits^{n}\limits_{k=1} ReLU(\mathbb{E}w_{i, k} \mathbb{E}z_{i, k}) = 0$
+  $\mathbb{E}z_{i+1} = \mathbb{E}(ReLU(w_i z_i)) = \sum\limits^{n_i}\limits_{k=1} ReLU(\mathbb{E}(w_{i, k} z_{i, k})) = \sum\limits^{n_i}\limits_{k=1} ReLU(\mathbb{E}w_{i, k} \mathbb{E}z_{i, k}) = 0$
 
 
 ### Questions:
