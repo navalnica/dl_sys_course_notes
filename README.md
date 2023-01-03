@@ -1022,9 +1022,9 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   buffer A to store `x` and buffer B to store `f(x)`. Then we write `f(x)` to A and `g(f(x))` to B and proceed. 
   For more complex cases, due to locality of intermediate activation nodes dependencies, we still can perform
   inference with a constant memory usage.
-* Training N-layer network requires $O(N)$ memory without any optimizations.
-  The reason is that intermediate activation values being used 
-  during backward pass.
+* Training N-layer network requires $O(N)$ memory
+  (no optimizer state and no model weights are included into consideration - only activation values).<br>
+  The reason is that intermediate activation values are used during backward pass.
 * **Activation checkpointing** (or simply **checkpointing**, or **re-materialization technique**) helps to 
   reduce amount of memory needed to run training.
   * The idea is that we save (checkpoint) only a portion of intermediate activations during a forward pass
@@ -1042,6 +1042,12 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 
 ### Parallel and distributed training
 * TODO
+
+### Questions:
+* when using activation checkpointing, I guess whe need to use some clever checkpointing technique to deal with 
+  skip connections or other complex elements of a network.<br>
+  to compute gradient for a node `x` we need to access (recompute if needed) all activation values for
+  parents of node `x`.
 
 
 <a id="lec16"></a>
