@@ -1306,7 +1306,68 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
 <a id="lec23"></a>
 
 ## [Lecture 23](https://www.youtube.com/watch?v=jCBrUisBQ0A) - Model Deployment
-* TODO
+
+### Trained model deployment challenges
+* There is a huge variety of target devices: CPU, mobile phones, embedded systems
+* Target device may not support python -> need to rewrite code in language that device supports:
+  * model inference code
+  * data pre- and post-processing
+* Minimize:
+  * size of a trained model (device memory is limited)
+  * battery consumption
+  * inference time
+* If a device has acceleration (e.g. Neural compute unit) need to write code to support this unit
+
+### Inference engines
+* Specialized frameworks are used for model deployment - **inference engines**
+* Examples of inference engines:
+  * TensorRT
+  * ARMComputeLib
+  * TFLite
+  * CoreML
+* To be able to use an inference engine, model is first converted to a special format
+ that describes computational graph and weights<br>
+  e.g: ONNX, CoreML, TFLite.
+* Inference engines use bunch of techniques for effective inference:
+  * allocated memory reuse
+  * operator fusion
+  * using lower precision / quantization
+
+### Machine learning compilation
+* Main idea: generate inference code automatically for any given target device.<br>
+  Instead of using specialized inference engines and libraries for each particular device (TensorRT, TFLite, CoreML)
+* Emerging field
+* During compilation optimized Intermediate Representations (IR) of a model and its layers are built
+  * Optimization techniques are also used here (operator fusion, memory reuse, etc.)
+  * IR could also be a direct set of instructions (code)
+  * IR is then translated to a target device language
+* Main difference with Inference engines is that computational graph is optimized before translation.
+  All that remains is to translate an already optimized graph to a target language
+* ML Compilation could also be used for model training, not only for inference
+
+### Low level code generation
+* Select the best of low-level implementations of specific ops
+* For a Matrix multiplication these implementations could be:
+  * vanilla MM
+  * MM with tiling
+  * MM using hardware intrinsics (vectorization? etc)
+* We apply different transforms on IR of an ML-program:
+  * split loops into multiple loops
+  * reorder loops
+  * bind loops to threads
+* And then we perform automated search of the best implementation (specific variant of transformed IR)
+* So main components of ML components are:
+  * **Search Planner** - creates a particular configuration of algorithm implementation
+  * **Code Generator** - generates particular algorithm implementation given a configuration from a Search Planner
+  * **ML Cost Model** - given measurements from a particular hardward estimates performance for a whole ML model 
+    using particular implementations from a Code Generator
+* With this setup we can **automatically** find the best implementation of a given ML-program on a specified hardware.
+  We no longer need to implement algorithms ourselves, measure performance 
+  and edit implementations to make them more efficient.
+
+### Machine Learning Compilation course links:
+* [mlc.ai](https://mlc.ai/)
+* [mlc.ai/summer22](https://mlc.ai/summer22)
 
 
 <a id="lec24"></a>
