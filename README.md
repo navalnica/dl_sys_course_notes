@@ -1356,11 +1356,12 @@ that allow to get a maximum benefit of a GPU accelerator if used in combination:
   * reorder loops
   * bind loops to threads
 * And then we perform automated search of the best implementation (specific variant of transformed IR)
-* So main components of ML components are:
+* So main components to find the best hardware implementation are:
   * **Search Planner** - creates a particular configuration of algorithm implementation
   * **Code Generator** - generates particular algorithm implementation given a configuration from a Search Planner
-  * **ML Cost Model** - given measurements from a particular hardward estimates performance for a whole ML model 
-    using particular implementations from a Code Generator
+  * **ML Cost Model** - given particular implementations from a Code Generator
+    and measurements from a particular hardware 
+    estimates performance for a whole ML model
 * With this setup we can **automatically** find the best implementation of a given ML-program on a specified hardware.
   We no longer need to implement algorithms ourselves, measure performance 
   and edit implementations to make them more efficient.
